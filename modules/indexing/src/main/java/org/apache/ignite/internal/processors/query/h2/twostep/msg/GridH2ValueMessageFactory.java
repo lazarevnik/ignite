@@ -92,6 +92,9 @@ public class GridH2ValueMessageFactory implements MessageFactory {
             case -22:
                 return new GridH2CacheObject();
 
+            case -23:
+                return new GridH2Json();
+
             case -30:
                 return new GridH2IndexRangeRequest();
 
@@ -228,6 +231,9 @@ public class GridH2ValueMessageFactory implements MessageFactory {
 
             case Value.GEOMETRY:
                 return new GridH2Geometry(v);
+
+            case Value.JSON:
+                return new GridH2Json(v);
 
             default:
                 throw new IllegalStateException("Unsupported H2 type: " + v.getType());

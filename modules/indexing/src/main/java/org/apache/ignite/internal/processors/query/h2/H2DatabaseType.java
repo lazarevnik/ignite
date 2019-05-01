@@ -83,6 +83,9 @@ public enum H2DatabaseType {
     GEOMETRY("GEOMETRY"),
 
     /** */
+    JSON("JSON"),
+
+    /** */
     OTHER("OTHER");
 
     /** Map of Class to enum. */
