@@ -152,6 +152,9 @@ public class GridBinaryMarshaller {
 
     /** Binary enum */
     public static final byte BINARY_ENUM = 38;
+    
+    /** JSON */
+    public static final byte JSON = 39;
 
     /** */
     public static final byte NULL = (byte)101;

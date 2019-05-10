@@ -263,6 +263,7 @@ import org.apache.ignite.transactions.TransactionOptimisticException;
 import org.apache.ignite.transactions.TransactionRollbackException;
 import org.apache.ignite.transactions.TransactionSerializationException;
 import org.apache.ignite.transactions.TransactionTimeoutException;
+import org.h2.util.json.JSONValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import sun.misc.Unsafe;
@@ -720,6 +721,7 @@ public abstract class IgniteUtils {
         primitiveMap.put("char", char.class);
         primitiveMap.put("boolean", boolean.class);
         primitiveMap.put("void", void.class);
+        primitiveMap.put("org.h2.utils.json.JSONValue", JSONValue.class);
 
         boxedClsMap.put(byte.class, Byte.class);
         boxedClsMap.put(short.class, Short.class);

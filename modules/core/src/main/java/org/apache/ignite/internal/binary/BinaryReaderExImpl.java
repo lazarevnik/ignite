@@ -1963,6 +1963,9 @@ public class BinaryReaderExImpl implements BinaryReader, BinaryRawReaderEx, Bina
                 obj = BinaryUtils.doReadOptimized(in, ctx, ldr);
 
                 break;
+                
+            case GridBinaryMarshaller.JSON:
+                obj = BinaryUtils.doReadString(in);
 
             default:
                 throw new BinaryObjectException("Invalid flag value: " + flag);

@@ -51,6 +51,8 @@ import org.apache.ignite.internal.util.typedef.F;
 import org.apache.ignite.internal.util.typedef.internal.S;
 import org.apache.ignite.internal.util.typedef.internal.U;
 import org.apache.ignite.marshaller.MarshallerExclusions;
+import org.h2.util.json.JSONValue;
+import org.h2.value.ValueJson;
 import org.jetbrains.annotations.Nullable;
 
 import static org.apache.ignite.internal.processors.query.QueryUtils.isGeometryClass;
@@ -183,6 +185,9 @@ public class BinaryClassDescriptor {
         else if (useOptMarshaller)
             mode = BinaryWriteMode.OPTIMIZED; // Will not be used anywhere.
         else {
+            if (cls == JSONValue.class) {
+                mode = BinaryWriteMode.JSON;
+            } else 
             if (cls == BinaryEnumObjectImpl.class)
                 mode = BinaryWriteMode.BINARY_ENUM;
             else
@@ -262,7 +267,6 @@ public class BinaryClassDescriptor {
                 intfs = cls.getInterfaces();
 
                 break;
-
             case BINARY:
                 ctor = constructor(cls);
                 fields = null;
@@ -334,6 +338,14 @@ public class BinaryClassDescriptor {
 
                 intfs = null;
 
+                break;
+            case JSON:
+                ctor = null;
+                fields = null;
+                stableFieldsMeta = null;
+                stableSchema = null;
+                intfs = null;
+                
                 break;
 
             default:

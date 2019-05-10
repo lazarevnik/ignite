@@ -70,6 +70,7 @@ import org.apache.ignite.internal.util.typedef.internal.U;
 import org.apache.ignite.transactions.TransactionAlreadyCompletedException;
 import org.apache.ignite.transactions.TransactionDuplicateKeyException;
 import org.apache.ignite.transactions.TransactionSerializationException;
+import org.h2.util.json.JSONValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -145,7 +146,8 @@ public class QueryUtils {
             LocalDateTime.class,
             String.class,
             UUID.class,
-            byte[].class
+            byte[].class,
+            JSONValue.class
         ));
 
         return sqlClasses;
@@ -251,6 +253,7 @@ public class QueryUtils {
      * @return Normalized query entity.
      */
     public static QueryEntity normalizeQueryEntity(QueryEntity entity, boolean escape) {
+        
         if (escape) {
             String tblName = tableName(entity);
 
@@ -442,7 +445,7 @@ public class QueryUtils {
         // key or value (which they could), we'll deem key or value as Object which clearly is not right.
         Class<?> keyCls = U.box(U.classForName(qryEntity.findKeyType(), null, true));
         Class<?> valCls = U.box(U.classForName(qryEntity.findValueType(), null, true));
-
+        
         // If local node has the classes and they are externalizable, we must use reflection properties.
         boolean keyMustDeserialize = mustDeserializeBinary(ctx, keyCls);
         boolean valMustDeserialize = mustDeserializeBinary(ctx, valCls);
@@ -613,11 +616,11 @@ public class QueryUtils {
             Object dfltVal = dlftVals != null ? dlftVals.get(fieldName) : null;
 
             QueryBinaryProperty prop = buildBinaryProperty(ctx, fieldName,
-                U.classForName(fieldType, Object.class, true),
+                "org.h2.utils.json.JSONValue".equals(fieldType)? JSONValue.class :
+                    U.classForName(fieldType, Object.class, true),
                 d.aliases(), isKeyField, notNull, dfltVal,
                 precision == null ? -1 : precision.getOrDefault(fieldName, -1),
                 scale == null ? -1 : scale.getOrDefault(fieldName, -1));
-
             d.addProperty(prop, false);
         }
 
@@ -664,7 +667,6 @@ public class QueryUtils {
         String typeName = isKey ? qryEntity.getKeyType() : qryEntity.getValueType();
 
         Object dfltVal = dfltVals.get(name);
-
         QueryBinaryProperty prop = buildBinaryProperty(
             ctx,
             name,
@@ -1087,7 +1089,7 @@ public class QueryUtils {
     public static boolean isSqlType(Class<?> cls) {
         cls = U.box(cls);
 
-        return SQL_TYPES.contains(cls) || QueryUtils.isGeometryClass(cls);
+        return SQL_TYPES.contains(cls) || QueryUtils.isGeometryClass(cls) || JSONValue.class == cls;
     }
 
     /**

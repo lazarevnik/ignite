@@ -71,6 +71,7 @@ import org.apache.ignite.internal.util.typedef.F;
 import org.apache.ignite.internal.util.typedef.internal.U;
 import org.apache.ignite.lang.IgniteBiTuple;
 import org.apache.ignite.lang.IgniteUuid;
+import org.h2.util.json.JSONValue;
 import org.jetbrains.annotations.Nullable;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -94,7 +95,7 @@ public class BinaryUtils {
     public static final Map<Class, BinaryWriteReplacer> CLS_TO_WRITE_REPLACER = new HashMap<>();
 
     /** {@code true} if serialized value of this type cannot contain references to objects. */
-    private static final boolean[] PLAIN_TYPE_FLAG = new boolean[102];
+    private static final boolean[] PLAIN_TYPE_FLAG = new boolean[103];
 
     /** Binary classes. */
     private static final Collection<Class<?>> BINARY_CLS = new HashSet<>();
@@ -204,7 +205,7 @@ public class BinaryUtils {
             GridBinaryMarshaller.CHAR, GridBinaryMarshaller.BOOLEAN, GridBinaryMarshaller.DECIMAL, GridBinaryMarshaller.STRING, GridBinaryMarshaller.UUID, GridBinaryMarshaller.DATE, GridBinaryMarshaller.TIMESTAMP, GridBinaryMarshaller.TIME,
             GridBinaryMarshaller.BYTE_ARR, GridBinaryMarshaller.SHORT_ARR, GridBinaryMarshaller.INT_ARR, GridBinaryMarshaller.LONG_ARR, GridBinaryMarshaller.FLOAT_ARR, GridBinaryMarshaller.DOUBLE_ARR, GridBinaryMarshaller.TIME_ARR,
             GridBinaryMarshaller.CHAR_ARR, GridBinaryMarshaller.BOOLEAN_ARR, GridBinaryMarshaller.DECIMAL_ARR, GridBinaryMarshaller.STRING_ARR, GridBinaryMarshaller.UUID_ARR, GridBinaryMarshaller.DATE_ARR, GridBinaryMarshaller.TIMESTAMP_ARR,
-            GridBinaryMarshaller.ENUM, GridBinaryMarshaller.ENUM_ARR, GridBinaryMarshaller.NULL}) {
+            GridBinaryMarshaller.ENUM, GridBinaryMarshaller.ENUM_ARR, GridBinaryMarshaller.NULL, GridBinaryMarshaller.JSON}) {
 
             PLAIN_TYPE_FLAG[b] = true;
         }
@@ -237,6 +238,7 @@ public class BinaryUtils {
         BINARY_CLS.add(Timestamp[].class);
         BINARY_CLS.add(Time[].class);
         BINARY_CLS.add(BigDecimal[].class);
+        BINARY_CLS.add(JSONValue.class);
 
         FIELD_TYPE_NAMES = new String[104];
 
@@ -277,6 +279,7 @@ public class BinaryUtils {
         FIELD_TYPE_NAMES[GridBinaryMarshaller.OBJ_ARR] = "Object[]";
         FIELD_TYPE_NAMES[GridBinaryMarshaller.ENUM_ARR] = "Enum[]";
         FIELD_TYPE_NAMES[GridBinaryMarshaller.BINARY_ENUM] = "Enum";
+        FIELD_TYPE_NAMES[GridBinaryMarshaller.JSON] = "Json";
 
         if (wrapTrees()) {
             CLS_TO_WRITE_REPLACER.put(TreeMap.class, new BinaryTreeMapWriteReplacer());
@@ -534,6 +537,12 @@ public class BinaryUtils {
             case GridBinaryMarshaller.TIME_ARR:
                 writer.doWriteTimeArray((Time[])val);
 
+                break;
+                
+            case GridBinaryMarshaller.JSON:
+                writer.writeByte(flag);
+                writer.writeString(val.toString());
+//                writer.writeBytes((JSONValue) val);
                 break;
 
             default:

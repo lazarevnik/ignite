@@ -76,6 +76,7 @@ import org.h2.result.SortOrder;
 import org.h2.table.Column;
 import org.h2.table.IndexColumn;
 import org.h2.util.LocalDateTimeUtils;
+import org.h2.util.json.JSONValue;
 import org.h2.value.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -541,7 +542,7 @@ public class H2Utils {
                 return ValueGeometry.getFromGeometry(obj);
 
             case Value.JSON:
-                return ValueJson.get(obj.toString());
+                return ValueJson.get((JSONValue) obj);
         }
 
         throw new IgniteCheckedException("Failed to wrap value[type=" + type + ", value=" + obj + "]");

@@ -121,6 +121,7 @@ import org.apache.ignite.lang.IgniteBiTuple;
 import org.apache.ignite.lang.IgniteUuid;
 import org.apache.ignite.marshaller.MarshallerContext;
 import org.apache.ignite.marshaller.MarshallerUtils;
+import org.h2.util.json.JSONValue;
 import org.jetbrains.annotations.Nullable;
 
 import static org.apache.ignite.internal.MarshallerPlatformIds.JAVA_ID;
@@ -202,6 +203,8 @@ public class BinaryContext {
 
         // BinaryUtils.FIELDS_SORTED_ORDER support, since it uses TreeMap at BinaryMetadata.
         sysClss.add(BinaryTreeMap.class.getName());
+        
+        sysClss.add(JSONValue.class.getName());
 
         if (BinaryUtils.wrapTrees()) {
             sysClss.add(TreeMap.class.getName());
@@ -319,6 +322,7 @@ public class BinaryContext {
         registerPredefinedType(Timestamp[].class, GridBinaryMarshaller.TIMESTAMP_ARR);
         registerPredefinedType(Time[].class, GridBinaryMarshaller.TIME_ARR);
         registerPredefinedType(Object[].class, GridBinaryMarshaller.OBJ_ARR);
+        registerPredefinedType(JSONValue.class, GridBinaryMarshaller.JSON);
 
         // Special collections.
         registerPredefinedType(ArrayList.class, 0);
@@ -383,7 +387,7 @@ public class BinaryContext {
                 return false;
 
             return marshCtx.isSystemType(cls.getName()) || serializerForClass(cls) == null ||
-                QueryUtils.isGeometryClass(cls);
+                QueryUtils.isGeometryClass(cls) || JSONValue.class == cls;
         }
         else
             return desc.useOptimizedMarshaller();
